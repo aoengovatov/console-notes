@@ -21,13 +21,32 @@ async function addNote(title) {
 async function deleteNoteById(id) {
     const notes = await getNotes();
     const notesIds = notes.map((note) => note.id);
-    console.log(notesIds);
+
     if (notesIds.includes(id)) {
         const filteredNotes = notes.filter((note) => note.id !== id);
 
         await fs.writeFile(notePath, JSON.stringify(filteredNotes));
 
         console.log(chalk.bgGreen("Note was deleted!"));
+        return;
+    }
+    console.log(chalk.bgRed("Note was not found"));
+}
+
+async function editNoteById(id, title) {
+    let notes = await getNotes();
+    const notesIds = notes.map((note) => note.id);
+
+    if (notesIds.includes(id)) {
+        const newNote = {
+            id,
+            title,
+        };
+
+        notes = notes.map((note) => (note.id === id ? newNote : note));
+
+        await fs.writeFile(notePath, JSON.stringify(notes));
+        console.log(chalk.bgGreen("Note was edited!"));
         return;
     }
     console.log(chalk.bgRed("Note was not found"));
@@ -49,4 +68,5 @@ module.exports = {
     addNote,
     printNotes,
     deleteNoteById,
+    editNoteById,
 };
